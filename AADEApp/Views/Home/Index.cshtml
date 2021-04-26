@@ -1,0 +1,16 @@
+﻿@model Aade.ViewModel.HomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to DeliDoc</h1>
+    
+    
+    <form asp-action="Create" enctype="multipart/form-data">
+        <input type="file" asp-for="MyDocument" />
+        <input type="submit" />
+    </form>
+
+</div>
