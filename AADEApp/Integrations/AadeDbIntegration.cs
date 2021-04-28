@@ -14,19 +14,9 @@ namespace Aade.Integrations
             _aadeIDbService = aadeIDbService;
         }
 
-        public List<AadeUser> GetAadeUsers()
+        public AspNetUsers GetUser(string id)
         {
-            var allAadeUsers = _aadeIDbService.Set().ToList();
-            var aade = new List<AadeUser>();
-            foreach (var aadeUser in allAadeUsers)
-            {
-                var a = new AadeUser();
-                a.AadeUserName = aadeUser.NormalizedUserName;
-                a.Email = aadeUser.NormalizedEmail;
-                aade.Add(a);
-            }
-
-            return aade;
+            return _aadeIDbService.Set().SingleOrDefault(i => i.Id == id);
         }
 
         public string GetAadeUserPublicKey(string email)
@@ -37,6 +27,16 @@ namespace Aade.Integrations
         public string GetAadeUserId(string email)
         {
             return _aadeIDbService.Set().SingleOrDefault(i => i.Email == email)?.Id;
+        }
+
+
+        public bool UpdateUser(AspNetUsers entity)
+        {
+            var isUpdated = _aadeIDbService.Update(entity.Id, entity);
+
+            _aadeIDbService.Save();
+
+            return isUpdated;
         }
 
 

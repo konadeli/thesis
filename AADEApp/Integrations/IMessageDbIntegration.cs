@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using Aade.Models;
 using Aade.Models.Messages;
+using Aade.ViewModel;
 
 namespace Aade.Integrations
 {
-    public interface IMessageDbIntegration 
+    public interface IMessageDbIntegration
     {
-        public string CreateMessage(Messages entity);
+        public List<MessagesForMe> GetMessageForAadeUser(string id);
     }
 }

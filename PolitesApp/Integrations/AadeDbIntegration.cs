@@ -21,17 +21,18 @@ namespace Users.Integrations
             foreach (var aadeUser in allAadeUsers)
             {
                 var a = new AadeUser();
-                a.AadeUserName = aadeUser.NormalizedUserName;
-                a.Email = aadeUser.NormalizedEmail;
+                a.AadeUserId = aadeUser.Id;
+                a.AadeUserName = aadeUser.UserName;
+                a.Email = aadeUser.Email;
                 aade.Add(a);
             }
 
             return aade;
         }
 
-        public string GetAadeUserPublicKey(string email)
+        public string GetAadeUserPublicKey(string id)
         {
-            return _aadeIDbService.Set().SingleOrDefault(i => i.Email == email)?.PublicKey;
+            return _aadeIDbService.Set().SingleOrDefault(i => i.Email == id)?.PublicKey;
         }
 
         public string GetAadeUserId(string email)

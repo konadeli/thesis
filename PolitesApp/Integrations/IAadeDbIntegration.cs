@@ -7,7 +7,7 @@ namespace Users.Integrations
     {
         public List<AadeUser> GetAadeUsers();
 
-        public string GetAadeUserPublicKey(string email);
+        public string GetAadeUserPublicKey(string id);
 
         public string GetAadeUserId(string email);
     }
