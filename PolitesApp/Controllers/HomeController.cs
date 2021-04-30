@@ -70,10 +70,10 @@ namespace Users.Controllers
                     Value = a.AadeUserId,
                     Text = a.Email
                 }).ToList();
-            
-            
-            
-            var model = new HomeViewModel {AadeUsers = AadeUsers};
+
+
+
+            var model = new HomeViewModel { AadeUsers = AadeUsers };
 
             model.ShowPasswordEntry = string.IsNullOrEmpty(user.SigningPassword);
 
@@ -161,12 +161,12 @@ namespace Users.Controllers
                         var messageToSave = new Messages();
                         //Create a ECDSA signature using secp256k1 curve and SHA256 and add to message
                         //https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-examples
-                        messageToSave.Signature = GetSignature(derivedKeyBytes, ByteArrayToString(message.Serialize()));
-                        Console.WriteLine("Signature: " + messageToSave.Signature + Environment.NewLine);
+                        //messageToSave.Signature = GetSignature(derivedKeyBytes, Convert.ToBase64String(array));
+                        //Console.WriteLine("Signature: " + messageToSave.Signature + Environment.NewLine);
 
 
                         // save to DB
-                        
+
                         messageToSave.UsersPublicKey = publicKey;
                         messageToSave.Message = message.Serialize();
                         messageToSave.AadeuserId = model.AadeUserId;
@@ -230,7 +230,7 @@ namespace Users.Controllers
             return Base58Encoding.Encode(publicKey.Q.GetEncoded());
         }
 
-        private static string GetSignature(byte[] privateKey, string message)
+        public static string GetSignature(byte[] privateKey, string message)
         {
             var curve = SecNamedCurves.GetByName("secp256k1");
             var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);

@@ -62,7 +62,7 @@ namespace Aade.Controllers
             engine.Init(false, privateKeyRecovered);
 
             // the message is saved as a byte array so convert back to Document object
-            var message = Document.Deserialize(doc.Message); 
+            var message = Document.Deserialize(doc.Message);
 
             // recover symmetric key
             var derivedKeyBytesToReceive = engine.ProcessBlock(message.EncryptedSymmetricKey, 0, message.EncryptedSymmetricKeyLength);
@@ -73,7 +73,7 @@ namespace Aade.Controllers
             var decryptedDocumentAsBytes = Convert.FromBase64String(decryptedDocument);
 
             // verify signature to ensure message was not tampered with
-            var isvalid = VerifySignature(ByteArrayToString(doc.Message), doc.UsersPublicKey, doc.Signature);
+            //var isvalid = VerifySignature(decryptedDocument, doc.UsersPublicKey, doc.Signature);
 
             doc.Status = 1;
             _messageDbIntegration.UpdateMessage(doc);

@@ -6,7 +6,8 @@
 }
 
 
-<h1 class="display-4">Welcome to DeliDoc AADE Document Viewer</h1>
+<h1 class="display-4">DeliDoc</h1>
+<h3>Εφαρμογή προβολής εγγράφων</h3>
 <div class="row">
     <div class="col-md-12">
         <div class="form-group" style="@(Model.MyMessages.Count > 0 ? "display:block" : "display:none")">
@@ -14,10 +15,10 @@
                 <thead>
                 <tr>
                     <td style="display: none;">Id</td>
-                    <td style="width:25%">From</td>
-                    <td style="width:25%">Document</td>
-                    <td style="width:25%">Date</td>
-                    <td style="width:25%">Status</td>
+                    <td style="width:25%">Από</td>
+                    <td style="width:25%">Έγγραφο</td>
+                    <td style="width:25%">Ημερομηνία</td>
+                    <td style="width:25%">Κατάσταση</td>
                 </tr>
                 </thead>
                 <tbody>
@@ -37,7 +38,7 @@
 
         <div class="form-group" style="@(Model.MyMessages.Count == 0 ? "display:block" : "display:none")">
             <div class="form-group">
-                <div class="col-md-6 d-inline">No documents have been shared with you yet</div>
+                <div class="col-md-6 d-inline">Δεν σας έχουν κοινοποιηθεί ακόμη έγγραφα</div>
             </div>
         </div>
     </div>

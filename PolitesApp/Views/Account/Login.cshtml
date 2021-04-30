@@ -3,8 +3,8 @@
     ViewData["Title"] = "Login";
 }
 
-<h1>Login to DeliDoc</h1>
-<h3>or create a new account from the register tab (this will be TaxisNet SSO in real system)</h3>
+<h1>DeliDoc Είσοδος/Login</h1>
+<p>ή κάντε εγγραφή / or create a new account from the register tab</p>
 
 <div class="row">
     <div class="col-md-12">
@@ -17,7 +17,7 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Password"></label>
+                <label asp-for="Password" value="">Κωδικός/Password</label>
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
@@ -29,7 +29,7 @@
                 </div>
 
             </div>
-            <button type="submit" class="btn-primary">Login</button>
+            <button type="submit" class="btn-primary">Είσοδος/Login</button>
         </form>
 
     </div>

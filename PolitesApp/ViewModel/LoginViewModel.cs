@@ -11,7 +11,7 @@ namespace Users.ViewModel
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
-        [Display(Name = "Remember Me")]
+        [Display(Name = "Να με θυμάσαι/Remember Me")]
         public bool RememberMe { get; set; }
     }
 }
