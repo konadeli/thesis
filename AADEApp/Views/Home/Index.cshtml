@@ -1,16 +1,45 @@
-﻿@model Aade.ViewModel.HomeViewModel
+﻿@using Aade.ViewModel
+@model Aade.ViewModel.HomeViewModel
 
 @{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Shared Documents";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to DeliDoc</h1>
-    
-    
-    <form asp-action="Create" enctype="multipart/form-data">
-        <input type="file" asp-for="MyDocument" />
-        <input type="submit" />
-    </form>
 
+<h1 class="display-4">Welcome to DeliDoc AADE Document Viewer</h1>
+<div class="row">
+    <div class="col-md-12">
+        <div class="form-group" style="@(Model.MyMessages.Count > 0 ? "display:block" : "display:none")">
+            <table class="col-md-12">
+                <thead>
+                <tr>
+                    <td style="display: none;">Id</td>
+                    <td style="width:25%">From</td>
+                    <td style="width:25%">Document</td>
+                    <td style="width:25%">Date</td>
+                    <td style="width:25%">Status</td>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (MessagesForMe msg in Model.MyMessages)
+                {
+                    <tr>
+                        <td style="display: none;">@msg.Id)</td>
+                        <td>@msg.PolitisEmail</td>
+                        <td>@msg.FileName</td>
+                        <td>@msg.DateModified</td>
+                        <td>@Html.ActionLink(msg.Status, "Index", "Doc", new { docid = msg.Id }, null)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="form-group" style="@(Model.MyMessages.Count == 0 ? "display:block" : "display:none")">
+            <div class="form-group">
+                <div class="col-md-6 d-inline">No documents have been shared with you yet</div>
+            </div>
+        </div>
+    </div>
 </div>
+

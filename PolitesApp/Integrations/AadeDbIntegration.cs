@@ -32,7 +32,7 @@ namespace Users.Integrations
 
         public string GetAadeUserPublicKey(string id)
         {
-            return _aadeIDbService.Set().SingleOrDefault(i => i.Email == id)?.PublicKey;
+            return _aadeIDbService.Set().SingleOrDefault(i => i.Id == id)?.PublicKey;
         }
 
         public string GetAadeUserId(string email)

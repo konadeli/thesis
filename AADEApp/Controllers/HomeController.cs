@@ -9,6 +9,7 @@ using ErrorViewModel = Aade.Models.ErrorViewModel;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using Aade.Models.Aade;
+using Aade.ViewModel;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto.Generators;
@@ -71,7 +72,10 @@ namespace Aade.Controllers
                 _aadeDbIntegration.UpdateUser(user);
             }
 
-            return View();
+            var model = new HomeViewModel();
+            var m = _messageDbIntegration.GetMessageForAadeUser(id);
+            model.MyMessages = m;
+            return View(model);
         }
 
 

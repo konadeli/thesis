@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Aade.Models.Messages;
 using Aade.Services;
 using Aade.ViewModel;
 
@@ -16,6 +17,21 @@ namespace Aade.Integrations
             _userDbIntegration = userDbIntegration;
         }
 
+        public bool UpdateMessage(Messages entity)
+        {
+            var response = _messageIDbService.Update(entity.Id, entity);
+
+            _messageIDbService.Save();
+
+            return response;
+        }
+
+        public Messages GetMessage(string id)
+        {
+            return _messageIDbService.Set()
+                .FirstOrDefault(a => a.Id == id);
+        }
+
         public List<MessagesForMe> GetMessageForAadeUser(string id)
         {
             var messages = _messageIDbService.Set()
@@ -26,14 +42,15 @@ namespace Aade.Integrations
                 var p = _userDbIntegration.GetUser(message.PolitisUserId);
                 var m = new MessagesForMe();
                 m.ContentType = message.ContentType;
-                m.DateCreated = message.DateCreated;
-                m.DateModified = message.DateModified;
+                m.DateModified = message.DateModified.ToShortDateString();
                 m.FileName = message.FileName;
                 m.Id = message.Id;
                 m.PolitisUserId = p.Id;
                 m.PolitisEmail = p.Email;
                 m.PolitisName = p.UserName;
-                m.Status = message.Status;
+                m.Status = message.Status == 0 ? "Unread" : "Read";
+
+                myMessages.Add(m);
             }
             return myMessages;
         }

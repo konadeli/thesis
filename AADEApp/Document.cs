@@ -1,21 +1,17 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Xml.Serialization;
 
 namespace CryptoExpt
 {
     [Serializable]
     public class Document
     {
-        public string FromPublicKey { get;  set; }
-        public int Length { get; set; }
-        public byte[] FileAsByteArray { get;  set; }
-        public string Signature { get;  set; }
-
-
-        public override string ToString()
-        {
-            return $"{ByteArrayToString(FileAsByteArray)}:{FromPublicKey}";
-        }
+        public string FromPublicKey { get; set; }
+        public int EncryptedSymmetricKeyLength { get; set; }
+        public byte[] EncryptedSymmetricKey { get; set; }
+        public string EncryptedDocument { get; set; }
 
         public static string ByteArrayToString(byte[] ba)
         {
@@ -25,15 +21,33 @@ namespace CryptoExpt
 
         public byte[] Serialize()
         {
-            using var m = new MemoryStream();
-            using (var writer = new BinaryWriter(m))
+            using (MemoryStream m = new MemoryStream())
             {
-                writer.Write(FromPublicKey);
-                writer.Write(Length);
-                writer.Write(FileAsByteArray);
-                writer.Write(Signature);
+                using (BinaryWriter writer = new BinaryWriter(m))
+                {
+                    writer.Write(FromPublicKey);
+                    writer.Write(EncryptedSymmetricKeyLength);
+                    writer.Write(EncryptedSymmetricKey);
+                    writer.Write(EncryptedDocument);
+                }
+                return m.ToArray();
             }
-            return m.ToArray();
+        }
+
+        public static Document Deserialize(byte[] data)
+        {
+            Document result = new Document();
+            using (MemoryStream m = new MemoryStream(data))
+            {
+                using (BinaryReader reader = new BinaryReader(m))
+                {
+                    result.FromPublicKey = reader.ReadString();
+                    result.EncryptedSymmetricKeyLength = reader.ReadInt32();
+                    result.EncryptedSymmetricKey = reader.ReadBytes(result.EncryptedSymmetricKeyLength);
+                    result.EncryptedDocument = reader.ReadString();
+                }
+            }
+            return result;
         }
 
     }

@@ -8,6 +8,7 @@ namespace Aade.Models.Messages
     {
         [Key]
         public string Id { get; set; }
+        public string Signature { get; set; }
         public string PolitisUserId { get; set; }
         public string AadeuserId { get; set; }
         public string FileName { get; set; }
@@ -16,5 +17,6 @@ namespace Aade.Models.Messages
         public short Status { get; set; }
         public DateTime DateCreated { get; set; }
         public DateTime DateModified { get; set; }
+        public string UsersPublicKey { get; set; }
     }
 }
