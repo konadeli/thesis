@@ -9,6 +9,6 @@ namespace Users.Integrations
 
         public string GetAadeUserPublicKey(string id);
 
-        public string GetAadeUserId(string email);
+        public AadeUser GetAadeUserEmailAddress(string id);
     }
 }

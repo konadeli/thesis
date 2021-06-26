@@ -7,35 +7,35 @@ namespace Aade.Services
 {
     public class AadeDbService<TContext> : IAadeDbService where TContext : DbContext
     {
-        private readonly TContext Context;
+        private readonly TContext _context;
 
         public AadeDbService(TContext context)
         {
-            Context = context;
+            _context = context;
         }
 
         public DbSet<AspNetUsers> Set() 
         {
-            return Context.Set<AspNetUsers>();
+            return _context.Set<AspNetUsers>();
         }
 
 
         public bool Update(string id, AspNetUsers model) 
         {
-            var entity = Context.Set<AspNetUsers>().FirstOrDefault(t => t.Id == id);
+            var entity = _context.Set<AspNetUsers>().FirstOrDefault(t => t.Id == id);
             if (entity == null) return false;
 
             model.Id = id;
 
-            Context.Entry(entity).CurrentValues.SetValues(model);
+            _context.Entry(entity).CurrentValues.SetValues(model);
 
             return true;
         }
 
         public void Save()
         {
-            Context.SaveChanges();
-            Context.Dispose();
+            _context.SaveChanges();
+            _context.Dispose();
         }
     }
 }

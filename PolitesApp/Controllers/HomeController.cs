@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
-using System.Xml.Serialization;
 using CryptoExpt;
+using MailKit.Net.Smtp;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MimeKit;
 using Users.Integrations;
 using Users.ViewModel;
 using ErrorViewModel = Users.Models.ErrorViewModel;
@@ -33,9 +34,10 @@ namespace Users.Controllers
         private readonly IUserDbIntegration _userDbIntegration;
         private readonly IAadeDbIntegration _aadeDbIntegration;
         private readonly IMessageDbIntegration _messageDbIntegration;
-
+        private readonly IConfiguration _configuration;
 
         public HomeController(
+            IConfiguration configuration,
             UserManager<AspNetUsers> userManager,
             IUserDbIntegration userDbIntegration,
             IAadeDbIntegration aadeDbIntegration,
@@ -47,6 +49,7 @@ namespace Users.Controllers
             _aadeDbIntegration = aadeDbIntegration;
             _messageDbIntegration = messageDbIntegration;
             _logger = logger;
+            _configuration = configuration;
         }
 
         [Authorize]
@@ -147,8 +150,8 @@ namespace Users.Controllers
                         // use it to ENCRYPT the one-time symmetric key. Now the one-time key can ONLY be decrypted by the AADE recipient, because only they have the private key
 
                         // first get the public key which is saved in a serialized form so must be converted back into a key object
-                        var aaudeUserPublicKey = _aadeDbIntegration.GetAadeUserPublicKey(model.AadeUserId);
-                        RsaKeyParameters publicKeyRecovered = (RsaKeyParameters)PublicKeyFactory.CreateKey(Convert.FromBase64String(aaudeUserPublicKey));
+                        var aadeUserPublicKey = _aadeDbIntegration.GetAadeUserPublicKey(model.AadeUserId);
+                        RsaKeyParameters publicKeyRecovered = (RsaKeyParameters)PublicKeyFactory.CreateKey(Convert.FromBase64String(aadeUserPublicKey));
 
                         // now ready to encrypt
                         // https://www.programmersought.com/article/7949780760/
@@ -161,8 +164,8 @@ namespace Users.Controllers
                         var messageToSave = new Messages();
                         //Create a ECDSA signature using secp256k1 curve and SHA256 and add to message
                         //https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-examples
-                        //messageToSave.Signature = GetSignature(derivedKeyBytes, Convert.ToBase64String(array));
-                        //Console.WriteLine("Signature: " + messageToSave.Signature + Environment.NewLine);
+                        messageToSave.Signature = GetSignature(derivedKeyBytes, Convert.ToBase64String(array));
+                        Console.WriteLine("Signature: " + messageToSave.Signature + Environment.NewLine);
 
 
                         // save to DB
@@ -181,8 +184,8 @@ namespace Users.Controllers
                         _messageDbIntegration.CreateMessage(messageToSave);
 
                         // notify AADE user by email
-
-
+                        var aaudeUserEmailAddress = _aadeDbIntegration.GetAadeUserEmailAddress(model.AadeUserId);
+                        SendEmail(aaudeUserEmailAddress);
                     }
                 }
             }
@@ -190,16 +193,6 @@ namespace Users.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        public static string SerializeObject(Document toSerialize)
-        {
-            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
-
-            using (StringWriter textWriter = new StringWriter())
-            {
-                xmlSerializer.Serialize(textWriter, toSerialize);
-                return textWriter.ToString();
-            }
-        }
 
         public IActionResult Privacy()
         {
@@ -211,6 +204,27 @@ namespace Users.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        private void SendEmail(AadeUser user)
+        {
+            var mailMessage = new MimeMessage();
+            mailMessage.From.Add(new MailboxAddress("DeliDoc", "aadedelidoc@gmail.com"));
+            mailMessage.To.Add(new MailboxAddress(user.AadeUserName, user.Email));
+            mailMessage.Subject = "Αρχείο από DeliDoc ";
+            mailMessage.Body = new TextPart("html")
+            {
+                Text = "<b>Έχεις αρχείο από DeliDoc</b>"
+            };
+
+            using var client = new SmtpClient();
+            client.Connect("smtp.gmail.com", 587, false);
+
+            client.Authenticate("aadedelidoc", _configuration["pwd"]);
+
+            client.Send(mailMessage);
+            client.Disconnect(true);
+        }
+
 
         private static string ByteArrayToString(byte[] ba)
         {
@@ -230,7 +244,7 @@ namespace Users.Controllers
             return Base58Encoding.Encode(publicKey.Q.GetEncoded());
         }
 
-        public static string GetSignature(byte[] privateKey, string message)
+        private static string GetSignature(byte[] privateKey, string message)
         {
             var curve = SecNamedCurves.GetByName("secp256k1");
             var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);

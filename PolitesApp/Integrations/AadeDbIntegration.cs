@@ -35,11 +35,18 @@ namespace Users.Integrations
             return _aadeIDbService.Set().SingleOrDefault(i => i.Id == id)?.PublicKey;
         }
 
-        public string GetAadeUserId(string email)
+        public AadeUser GetAadeUserEmailAddress(string id)
         {
-            return _aadeIDbService.Set().SingleOrDefault(i => i.Email == email)?.Id;
-        }
+            var aadeUser = _aadeIDbService.Set().SingleOrDefault(i => i.Id == id);
 
+            var a = new AadeUser();
+            a.AadeUserId = aadeUser.Id;
+            a.AadeUserName = aadeUser.UserName;
+            a.Email = aadeUser.Email;
+
+            return a;
+
+        }
 
     }
 }

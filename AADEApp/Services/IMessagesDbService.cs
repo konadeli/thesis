@@ -8,6 +8,5 @@ namespace Aade.Services
         void Save();
         DbSet<Messages> Set();
         bool Update(string id, Messages model);
-        string Create(Messages model);
     }
 }

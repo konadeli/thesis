@@ -24,19 +24,16 @@ namespace Aade.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<AspNetUsers> _userManager;
-        private readonly IUserDbIntegration _userDbIntegration;
         private readonly IAadeDbIntegration _aadeDbIntegration;
         private readonly IMessageDbIntegration _messageDbIntegration;
 
         public DocController(
             UserManager<AspNetUsers> userManager,
-            IUserDbIntegration userDbIntegration,
             IAadeDbIntegration aadeDbIntegration,
             IMessageDbIntegration messageDbIntegration,
             ILogger<HomeController> logger)
         {
             _userManager = userManager;
-            _userDbIntegration = userDbIntegration;
             _aadeDbIntegration = aadeDbIntegration;
             _messageDbIntegration = messageDbIntegration;
             _logger = logger;
@@ -73,7 +70,7 @@ namespace Aade.Controllers
             var decryptedDocumentAsBytes = Convert.FromBase64String(decryptedDocument);
 
             // verify signature to ensure message was not tampered with
-            //var isvalid = VerifySignature(decryptedDocument, doc.UsersPublicKey, doc.Signature);
+            var isvalid = VerifySignature(decryptedDocument, doc.UsersPublicKey, doc.Signature);
 
             doc.Status = 1;
             _messageDbIntegration.UpdateMessage(doc);
@@ -81,20 +78,10 @@ namespace Aade.Controllers
             return File(decryptedDocumentAsBytes, doc.ContentType, doc.FileName);
         }
 
-        public static string SerializeObject(Document toSerialize)
-        {
-            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
-
-            using (StringWriter textWriter = new StringWriter())
-            {
-                xmlSerializer.Serialize(textWriter, toSerialize);
-                return textWriter.ToString();
-            }
-        }
 
         // Third-party can verify signature against public key to ensure its not been tampered with but cannot
         // change it themselves as they do not have the private key
-        public static bool VerifySignature(string message, string publicKey, string signature)
+        private static bool VerifySignature(string message, string publicKey, string signature)
         {
             var curve = SecNamedCurves.GetByName("secp256k1");
             var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
@@ -117,10 +104,5 @@ namespace Aade.Controllers
             return signer.VerifySignature(signatureBytes);
         }
 
-        private static string ByteArrayToString(byte[] ba)
-        {
-            string hex = BitConverter.ToString(ba);
-            return hex.Replace("-", "");
-        }
     }
 }

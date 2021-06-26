@@ -17,15 +17,5 @@ namespace Aade.Integrations
             return _userIDbService.Set().SingleOrDefault(i => i.Id == id);
         }
 
-
-        public bool UpdateUser(AspNetUsers entity)
-        {
-            var isUpdated = _userIDbService.Update(entity.Id, entity);
-
-            _userIDbService.Save();
-
-            return isUpdated;
-        }
-
     }
 }

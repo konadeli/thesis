@@ -18,25 +18,6 @@ namespace Aade.Services
         {
             return Context.Set<AspNetUsers>();
         }
-
-
-        public bool Update(string id, AspNetUsers model) 
-        {
-            var entity = Context.Set<AspNetUsers>().FirstOrDefault(t => t.Id == id);
-            if (entity == null) return false;
-
-            model.Id = id;
-
-            Context.Entry(entity).CurrentValues.SetValues(model);
-
-            return true;
-        }
-
-        public void Save()
-        {
-            Context.SaveChanges();
-            Context.Dispose();
-        }
     }
 }
 

@@ -22,20 +22,17 @@ namespace Aade.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly UserManager<AspNetUsers> _userManager;
-        private readonly IUserDbIntegration _userDbIntegration;
         private readonly IAadeDbIntegration _aadeDbIntegration;
         private readonly IMessageDbIntegration _messageDbIntegration;
 
 
         public HomeController(
             UserManager<AspNetUsers> userManager,
-            IUserDbIntegration userDbIntegration,
             IAadeDbIntegration aadeDbIntegration,
             IMessageDbIntegration messageDbIntegration,
             ILogger<HomeController> logger)
         {
             _userManager = userManager;
-            _userDbIntegration = userDbIntegration;
             _aadeDbIntegration = aadeDbIntegration;
             _messageDbIntegration = messageDbIntegration;
             _logger = logger;

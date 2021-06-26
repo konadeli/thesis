@@ -20,13 +20,6 @@ namespace Aade.Services
             return Context.Set<Messages>();
         }
 
-        public string Create(Messages model)
-        {
-            Context.Set<Messages>().Add(model);
-            return model.Id;
-        }
-
-
         public bool Update(string id, Messages model) 
         {
             var entity = Context.Set<Messages>().FirstOrDefault(t => t.Id == id);
