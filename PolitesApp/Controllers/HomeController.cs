@@ -164,7 +164,7 @@ namespace Users.Controllers
                         var messageToSave = new Messages();
                         //Create a ECDSA signature using secp256k1 curve and SHA256 and add to message
                         //https://cryptobook.nakov.com/digital-signatures/ecdsa-sign-verify-examples
-                        messageToSave.Signature = GetSignature(derivedKeyBytes, Convert.ToBase64String(array));
+                        messageToSave.Signature = GetSignature(derivedKey, Convert.ToBase64String(array));
                         Console.WriteLine("Signature: " + messageToSave.Signature + Environment.NewLine);
 
 
@@ -185,7 +185,7 @@ namespace Users.Controllers
 
                         // notify AADE user by email
                         var aaudeUserEmailAddress = _aadeDbIntegration.GetAadeUserEmailAddress(model.AadeUserId);
-                        SendEmail(aaudeUserEmailAddress);
+                        SendEmail(aaudeUserEmailAddress, user);
                     }
                 }
             }
@@ -205,15 +205,15 @@ namespace Users.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private void SendEmail(AadeUser user)
+        private void SendEmail(AadeUser aade, AspNetUsers user)
         {
             var mailMessage = new MimeMessage();
             mailMessage.From.Add(new MailboxAddress("DeliDoc", "aadedelidoc@gmail.com"));
-            mailMessage.To.Add(new MailboxAddress(user.AadeUserName, user.Email));
+            mailMessage.To.Add(new MailboxAddress(aade.AadeUserName, aade.Email));
             mailMessage.Subject = "Αρχείο από DeliDoc ";
             mailMessage.Body = new TextPart("html")
             {
-                Text = "<b>Έχεις αρχείο από DeliDoc</b>"
+                Text = "<b>Έχετε αρχείο στο DeliDoc από " + user.UserName + " </b>"
             };
 
             using var client = new SmtpClient();
@@ -244,13 +244,13 @@ namespace Users.Controllers
             return Base58Encoding.Encode(publicKey.Q.GetEncoded());
         }
 
-        private static string GetSignature(byte[] privateKey, string message)
+        private static string GetSignature(string privateKey, string message)
         {
             var curve = SecNamedCurves.GetByName("secp256k1");
             var domain = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H);
 
             var keyParameters = new
-                ECPrivateKeyParameters(new Org.BouncyCastle.Math.BigInteger(privateKey),
+                ECPrivateKeyParameters(new Org.BouncyCastle.Math.BigInteger(privateKey, 16),
                     domain);
 
             var signer = SignerUtilities.GetSigner("SHA-256withECDSA");
